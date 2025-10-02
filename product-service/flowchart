@@ -1,0 +1,15 @@
+[Client Applications]
+    │
+    ├── Web UI (React/Angular)
+    └── Mobile App
+            │
+            │
+[API Gateway] ──── [Service Discovery (Eureka)]
+            │
+            ├─────────────────┬──────────────┬─────────────┬────────────┬────────────┐
+            │                 │              │             │            │            │
+[Auth Service]    [Product Service]  [Order Service] [Cart Service] [User Service] [Payment Service]
+    │                 │              │             │            │            │
+    │                 │              │             │            │            │
+[Databases]           │              │             │            │            │
+    ├── Auth DB       ├── Product DB └── Order DB  └── Cart DB  └── User DB └── Payment DB

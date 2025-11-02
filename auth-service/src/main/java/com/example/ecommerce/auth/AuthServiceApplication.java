@@ -1,13 +1,13 @@
-package com.example.ecommerce.product;
+package com.example.ecommerce.auth;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
-@SpringBootApplication(scanBasePackages = "com.example.ecommerce.product")
+@SpringBootApplication
 @EnableDiscoveryClient
-public class ProductServiceApplication {
+public class AuthServiceApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ProductServiceApplication.class, args);
+        SpringApplication.run(AuthServiceApplication.class, args);
     }
 }

@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: auth-service
+
+server:
+  port: 8082
+
+datasource:
+      url: jdbc:mysql://localhost:3306/authdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      username: root
+      password: Sourabh@123
+      driver-class-name: com.mysql.cj.jdbc.Driver
+#   jpa:
+#     database-platform: org.hibernate.dialect.MySQL8Dialect
+#     hibernate:
+#       ddl-auto: update
+#     show-sql: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  secret: mysupersecretkey1234567890123456789012345678901234
+  expiration-ms: 3600000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

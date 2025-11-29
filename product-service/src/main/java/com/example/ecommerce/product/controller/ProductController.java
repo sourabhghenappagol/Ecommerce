@@ -1,7 +1,7 @@
 package com.example.ecommerce.product.controller;
 
-import com.ecommerce.productservice.entity.Product;
-import com.ecommerce.productservice.service.ProductService;
+import com.example.ecommerce.product.Entity.Product;
+import com.example.ecommerce.product.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

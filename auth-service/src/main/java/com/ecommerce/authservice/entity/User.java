@@ -57,5 +57,31 @@ public class User {
         this.email = email;
     }
 
+    // Explicit setter accepting the Role enum (replaces Lombok-generated setter for clarity)
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    // Convenience setter that accepts common string values like "USER" or "ROLE_USER"
+    public void setRole(String roleStr) {
+        if (roleStr == null) {
+            this.role = null;
+            return;
+        }
+        String normalized = roleStr.trim().toUpperCase();
+        if (!normalized.startsWith("ROLE_")) {
+            normalized = "ROLE_" + normalized;
+        }
+        try {
+            this.role = Role.valueOf(normalized);
+        } catch (IllegalArgumentException ex) {
+            // Unknown value - fallback to ROLE_USER (or you can throw an exception)
+            this.role = Role.ROLE_USER;
+        }
+    }
+    // Explicit getter for role (keeps symmetry with explicit setters and helps clarity)
+    public Role getRole() {
+        return this.role;
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.ecommerce.authservice.service;
 
 import com.ecommerce.authservice.config.JwtUtil;
+import com.ecommerce.authservice.entity.Role;
 import com.ecommerce.authservice.entity.User;
 import com.ecommerce.authservice.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,17 +22,18 @@ public class AuthService {
 
     public String register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole("USER");
+        user.setRole(Role.ROLE_USER);
         userRepository.save(user);
         return "User registered successfully!";
     }
 
     public String login(String username, String password) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Invalid username"));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid username"));
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new IllegalArgumentException("Invalid password");
         }
-        return jwtUtil.generateToken(username);
+        String roleName = user.getRole() != null ? user.getRole().name() : Role.ROLE_USER.name();
+        return jwtUtil.generateToken(username, roleName);
     }
 }

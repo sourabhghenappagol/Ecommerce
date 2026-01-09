@@ -16,7 +16,8 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration}")
+    // application.yml uses 'jwt.expiration-ms' so read that. Provide a default of 3600000 (1 hour).
+    @Value("${jwt.expiration-ms:3600000}")
     private long expirationMs;
 
     private Key getSigningKey() {

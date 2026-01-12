@@ -2,20 +2,26 @@ spring:
   application:
     name: auth-service
 
+  datasource:
+    url: jdbc:mysql://localhost:3306/authdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: root
+    password: Sourabh@123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+
 server:
   port: 8082
+  # bind to all interfaces if you want external access (development only)
+  # address: 0.0.0.0
 
-datasource:
-      url: jdbc:mysql://localhost:3306/authdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      username: root
-      password: Sourabh@123
-      driver-class-name: com.mysql.cj.jdbc.Driver
-#   jpa:
-#     database-platform: org.hibernate.dialect.MySQL8Dialect
-#     hibernate:
-#       ddl-auto: update
-#     show-sql: true
-
+# Eureka client settings
 eureka:
   client:
     serviceUrl:

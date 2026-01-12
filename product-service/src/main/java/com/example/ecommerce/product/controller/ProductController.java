@@ -33,7 +33,7 @@ public class ProductController {
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.saveProduct(product));
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);

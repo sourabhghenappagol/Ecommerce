@@ -3,9 +3,12 @@ package com.ecommerce.authservice.service;
 import com.ecommerce.authservice.config.JwtUtil;
 import com.ecommerce.authservice.entity.Role;
 import com.ecommerce.authservice.entity.User;
+import com.ecommerce.authservice.exception.UserAlreadyExistsException;
 import com.ecommerce.authservice.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -20,11 +23,15 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
-    public String register(User user) {
+    public User register(User user) {
+        // Check for existing username
+        Optional<User> existing = userRepository.findByUsername(user.getUsername());
+        if (existing.isPresent()) {
+            throw new UserAlreadyExistsException("Username already exists: " + user.getUsername());
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.ROLE_USER);
-        userRepository.save(user);
-        return "User registered successfully!";
+        return userRepository.save(user);
     }
 
     public String login(String username, String password) {

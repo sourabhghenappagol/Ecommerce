@@ -32,7 +32,7 @@ eureka:
     prefer-ip-address: true
 
 jwt:
-  secret: mysupersecretkey1234567890123456789012345678901234
+  secret: mySuperSecureJwtSecretKeyForHS256Algorithm123456
   expiration-ms: 3600000
 
 springdoc:

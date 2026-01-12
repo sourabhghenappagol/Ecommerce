@@ -29,7 +29,7 @@ spring:
 # JWT Configuration
 # ===============================
 jwt:
-  secret: mySecretKey1234567890   # MUST be same as auth-service
+  secret: mySuperSecureJwtSecretKeyForHS256Algorithm123456   # MUST be same as auth-service
 
 # ===============================
 # Swagger / OpenAPI

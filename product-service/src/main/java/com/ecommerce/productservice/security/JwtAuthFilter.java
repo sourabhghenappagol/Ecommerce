@@ -1,8 +1,5 @@
-// JwtAuthFilter.java
-package com.example.ecommerce.product.security;
+package com.ecommerce.productservice.security;
 
-import com.example.ecommerce.product.config.JwtUtil; // similar util in product service
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import com.ecommerce.productservice.config.JwtUtil;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -27,15 +25,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain chain) throws ServletException, IOException {
+                                    FilterChain chain)
+            throws ServletException, IOException {
 
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            chain.doFilter(request, response); // let security block later if endpoint is protected
+            chain.doFilter(request, response);
             return;
         }
 
-        final String token = authHeader.substring(7);
+        String token = authHeader.substring(7);
+
         if (!jwtUtil.validateToken(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Invalid or expired token");
@@ -43,15 +44,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         String username = jwtUtil.extractUsername(token);
-        String role = jwtUtil.extractRole(token); // e.g., "ROLE_ADMIN" or "ROLE_USER"
+        String role = jwtUtil.extractRole(token); // ROLE_USER / ROLE_ADMIN
 
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(username, null, Collections.singleton(authority));
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(
+                        username,
+                        null,
+                        Collections.singleton(new SimpleGrantedAuthority(role))
+                );
 
-        SecurityContextHolder.getContext().setAuthentication(authToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(request, response);
     }
 }
-// JwtAuthFilter.java
-

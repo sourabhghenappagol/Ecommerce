@@ -13,26 +13,63 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update   # use validate in prod
     show-sql: true
+    open-in-view: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
 
+  jackson:
+    serialization:
+      indent_output: true
+
+# ===============================
+# JWT Configuration
+# ===============================
+jwt:
+  secret: mySecretKey1234567890   # MUST be same as auth-service
+
+# ===============================
+# Swagger / OpenAPI
+# ===============================
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+  api-docs:
+    path: /api-docs
+
+# ===============================
+# Eureka Client
+# ===============================
 eureka:
   client:
+    register-with-eureka: true
+    fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka/
   instance:
     prefer-ip-address: true
 
-    springdoc:
-      api-docs:
-        path: /api-docs
-      swagger-ui:
-        path: /swagger-ui.html
-        operationsSorter: method
-        tagsSorter: alpha
-jwt:
-  secret: mySecretKey1234567890
+# ===============================
+# Actuator (Optional but useful)
+# ===============================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+# ===============================
+# Logging (Readable during dev)
+# ===============================
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace

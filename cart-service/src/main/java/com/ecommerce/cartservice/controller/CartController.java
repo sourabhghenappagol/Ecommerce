@@ -50,12 +50,12 @@ public class CartController {
      * Remove product from cart
      */
     @DeleteMapping("/remove/{productId}")
-    public ResponseEntity<Cart> removeItem(
+    public ResponseEntity<String> removeItem(
             Authentication authentication,
             @PathVariable Long productId) {
 
         Cart cart = cartService.removeItem(authentication.getName(), productId);
-        return ResponseEntity.ok(cart);
+        return ResponseEntity.ok(productId + " removed from cart");
     }
 
     /**

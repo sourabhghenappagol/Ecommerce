@@ -1,5 +1,6 @@
 package com.ecommerce.cartservice.controller;
 
+import com.ecommerce.cartservice.dto.AddToCartRequest;
 import com.ecommerce.cartservice.entity.Cart;
 import com.ecommerce.cartservice.entity.CartItem;
 import com.ecommerce.cartservice.service.CartService;
@@ -27,11 +28,15 @@ public class CartController {
     @PostMapping("/add")
     public ResponseEntity<Cart> addToCart(
             Authentication authentication,
-            @RequestBody CartItem item) {
+            @RequestBody AddToCartRequest request) {
 
-        return ResponseEntity.ok(
-                cartService.addItem(authentication.getName(), item)
+        Cart cart = cartService.addItem(
+                authentication.getName(),
+                request.getProductId(),
+                request.getQuantity()
         );
+
+        return ResponseEntity.ok(cart);
     }
 
     @DeleteMapping("/remove/{productId}")

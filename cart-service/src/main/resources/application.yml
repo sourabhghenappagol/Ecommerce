@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/cartdb
     username: root
-    password: admin
+    password: Sourabh@123
 
   jpa:
     hibernate:

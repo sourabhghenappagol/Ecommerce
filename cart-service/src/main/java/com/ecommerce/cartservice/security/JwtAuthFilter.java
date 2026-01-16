@@ -34,10 +34,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
             return;
         }
-        System.out.println("AUTH HEADER = [" + authHeader + "]");
 
 
-        String token = authHeader.substring(7).trim();;
+        String token = authHeader.substring(7).trim();
 
         if (!jwtUtil.validateToken(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

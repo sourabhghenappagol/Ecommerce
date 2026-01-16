@@ -4,6 +4,7 @@ import com.ecommerce.cartservice.dto.ProductResponse;
 import com.ecommerce.cartservice.entity.Cart;
 import com.ecommerce.cartservice.entity.CartItem;
 import com.ecommerce.cartservice.repository.CartRepository;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,8 +23,7 @@ public class CartService {
     }
 
     /**
-     * Get cart for logged-in user.
-     * If cart does not exist, create a new one.
+     * Get or create cart for user
      */
     public Cart getCart(String username) {
         return cartRepository.findByUsername(username)
@@ -36,16 +36,32 @@ public class CartService {
     }
 
     /**
-     * Add product to cart.
-     * Frontend sends ONLY productId and quantity.
+     * Add item to cart.
      * Product details are fetched from Product Service.
+     * JWT is forwarded for authorization.
      */
-    public Cart addItem(String username, Long productId, int quantity) {
+    public Cart addItem(String username,
+                        Long productId,
+                        int quantity,
+                        String authorizationHeader) {
 
-        // 1️ Fetch product from Product Service (source of truth)
+        // 1️⃣ Call Product Service with JWT
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", authorizationHeader);
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
         String productUrl = "http://localhost:8081/api/products/" + productId;
-        ProductResponse product =
-                restTemplate.getForObject(productUrl, ProductResponse.class);
+
+        ResponseEntity<ProductResponse> response =
+                restTemplate.exchange(
+                        productUrl,
+                        HttpMethod.GET,
+                        entity,
+                        ProductResponse.class
+                );
+
+        ProductResponse product = response.getBody();
 
         if (product == null) {
             throw new RuntimeException("Product not found");
@@ -62,7 +78,7 @@ public class CartService {
         // 2️ Get or create cart
         Cart cart = getCart(username);
 
-        // 3️ If product already exists in cart → update quantity
+        // 3 If item already exists, update quantity
         for (CartItem item : cart.getItems()) {
             if (item.getProductId().equals(productId)) {
                 item.setQuantity(item.getQuantity() + quantity);
@@ -70,11 +86,11 @@ public class CartService {
             }
         }
 
-        // 4️ Add new item
+        // 4 Add new cart item (snapshot)
         CartItem newItem = new CartItem();
         newItem.setProductId(product.getId());
-        newItem.setProductName(product.getName());   // snapshot
-        newItem.setPrice(product.getPrice());        // snapshot
+        newItem.setProductName(product.getName());
+        newItem.setPrice(product.getPrice());
         newItem.setQuantity(quantity);
         newItem.setCart(cart);
 
@@ -83,7 +99,7 @@ public class CartService {
     }
 
     /**
-     * Remove a product from cart.
+     * Remove item from cart
      */
     public Cart removeItem(String username, Long productId) {
         Cart cart = getCart(username);
@@ -94,7 +110,7 @@ public class CartService {
     }
 
     /**
-     * Clear entire cart.
+     * Clear cart
      */
     public void clearCart(String username) {
         Cart cart = getCart(username);

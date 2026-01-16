@@ -47,7 +47,8 @@ public class JwtUtil {
         try {
             getAllClaims(token);
             return true;
-        } catch (JwtException | IllegalArgumentException ex) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }

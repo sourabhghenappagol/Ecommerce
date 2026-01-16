@@ -1,0 +1,24 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: cart-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/cartdb
+    username: root
+    password: admin
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+jwt:
+  secret: mySuperSecureJwtSecretKeyForHS256Algorithm123456
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

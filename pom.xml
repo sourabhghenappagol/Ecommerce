@@ -29,6 +29,7 @@
         <module>eureka-server</module>
         <module>auth-service</module>
         <module>cart-service</module>
+        <module>order-service</module>
     </modules>
 
     <dependencyManagement>

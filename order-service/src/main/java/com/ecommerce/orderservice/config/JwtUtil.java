@@ -1,12 +1,14 @@
 package com.ecommerce.orderservice.config;
 
-import io.jsonwebtoken.*;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Base64;
 
 @Component
 public class JwtUtil {
@@ -15,11 +17,10 @@ public class JwtUtil {
     private String secret;
 
     private Key getKey() {
-        byte[] decodedKey = Base64.getDecoder().decode(secret);
-        return Keys.hmacShaKeyFor(decodedKey);
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public Claims extractAllClaims(String token) {
+    public Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getKey())
                 .build()
@@ -27,19 +28,19 @@ public class JwtUtil {
                 .getBody();
     }
 
-    public String extractUsername(String token) {
-        return extractAllClaims(token).getSubject();
+    public String getUsername(String token) {
+        return getClaims(token).getSubject();
     }
 
-    public String extractRole(String token) {
-        return extractAllClaims(token).get("role", String.class);
+    public String getRole(String token) {
+        return getClaims(token).get("role", String.class);
     }
 
-    public boolean validateToken(String token) {
+    public boolean isValid(String token) {
         try {
-            extractAllClaims(token);
+            getClaims(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (Exception e) {
             return false;
         }
     }

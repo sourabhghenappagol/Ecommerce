@@ -9,27 +9,11 @@ spring:
     url: jdbc:mysql://localhost:3306/orderdb
     username: root
     password: Sourabh@123
-    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-    open-in-view: false
 
 jwt:
   secret: mySuperSecureJwtSecretKeyForHS256Algorithm123456
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-  api-docs:
-    path: /v3/api-docs
-
-logging:
-  level:
-    org.springframework.security: INFO
-    org.hibernate.SQL: DEBUG

@@ -1,12 +1,12 @@
 package com.ecommerce.orderservice.security;
 
-import com.ecommerce.orderservice.config.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import com.ecommerce.orderservice.config.JwtUtil;
 
 @Configuration
 @EnableMethodSecurity
@@ -19,21 +19,25 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        JwtAuthFilter jwtAuthFilter = new JwtAuthFilter(jwtUtil);
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // ✅ Swagger must be open
                         .requestMatchers(
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**"
                         ).permitAll()
+
+                        // ✅ Everything else requires auth
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(
+                        new JwtAuthFilter(jwtUtil),
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }

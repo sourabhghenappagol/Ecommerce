@@ -17,3 +17,13 @@ spring:
 
 jwt:
   secret: mySuperSecureJwtSecretKeyForHS256Algorithm123456
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: cart-service-group
+      auto-offset-reset: earliest
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+

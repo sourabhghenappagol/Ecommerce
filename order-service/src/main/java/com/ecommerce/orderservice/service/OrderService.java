@@ -5,6 +5,7 @@ import com.ecommerce.orderservice.dto.CartResponse;
 import com.ecommerce.orderservice.entity.Order;
 import com.ecommerce.orderservice.entity.OrderItem;
 import com.ecommerce.orderservice.entity.OrderStatus;
+import com.ecommerce.orderservice.kafka.OrderEventProducer;
 import com.ecommerce.orderservice.repository.OrderRepository;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,12 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final RestTemplate restTemplate;
-
+    private final OrderEventProducer orderEventProducer;
     public OrderService(OrderRepository orderRepository,
-                        RestTemplate restTemplate) {
+                        RestTemplate restTemplate, OrderEventProducer orderEventProducer) {
         this.orderRepository = orderRepository;
         this.restTemplate = restTemplate;
+        this.orderEventProducer = orderEventProducer;
     }
 
     /**
@@ -104,14 +106,9 @@ public class OrderService {
         // -------------------------------
         // 5️⃣ Clear cart AFTER order success
         // -------------------------------
-        String clearCartUrl = "http://localhost:8083/api/cart/clear";
-
-        restTemplate.exchange(
-                clearCartUrl,
-                HttpMethod.DELETE,
-                entity,
-                Void.class
-        );
+        orderEventProducer.publishOrderCreatedEvent(
+                username,
+                savedOrder.getId());
 
         return savedOrder;
     }

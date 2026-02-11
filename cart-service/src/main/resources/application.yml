@@ -15,6 +15,28 @@ spring:
       ddl-auto: update
     show-sql: true
 
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    consumer:
+      group-id: cart-service-group
+      auto-offset-reset: earliest
+      # Use ErrorHandlingDeserializer so deserialization exceptions are handled by the listener error handler
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        # delegate the actual deserialization for the key to the StringDeserializer
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        # delegate the actual deserialization for the value to the StringDeserializer (listener expects raw String)
+        spring.deserializer.value.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        # trust packages is unnecessary for String deserialization; keep for compatibility
+        spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
 jwt:
   secret: mySuperSecureJwtSecretKeyForHS256Algorithm123456
 
@@ -22,13 +44,3 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
-
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: cart-service-group
-      auto-offset-reset: earliest
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-

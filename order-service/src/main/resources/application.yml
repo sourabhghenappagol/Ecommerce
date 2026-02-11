@@ -15,9 +15,6 @@ spring:
       ddl-auto: update
     show-sql: true
 
-jwt:
-  secret: mySuperSecureJwtSecretKeyForHS256Algorithm123456
-
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
@@ -26,4 +23,9 @@ jwt:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+jwt:
+  secret: mySuperSecureJwtSecretKeyForHS256Algorithm123456
+
+
 

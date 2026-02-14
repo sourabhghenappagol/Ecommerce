@@ -6,6 +6,7 @@ import com.ecommerce.cartservice.entity.CartItem;
 import com.ecommerce.cartservice.repository.CartRepository;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -112,8 +113,13 @@ public class CartService {
     /**
      * Clear cart
      */
+    @Transactional
     public void clearCart(String username) {
-        Cart cart = getCart(username);
+        // fetch the cart inside a transaction so Hibernate session is open
+        Cart cart = cartRepository.findByUsername(username).orElse(null);
+        if (cart == null) {
+            return;
+        }
         cart.getItems().clear();
         cartRepository.save(cart);
     }

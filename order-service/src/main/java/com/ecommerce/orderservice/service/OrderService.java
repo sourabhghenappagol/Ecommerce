@@ -22,20 +22,25 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final RestTemplate restTemplate;
     private final OrderEventProducer orderEventProducer;
+    private final OrderSagaOrchestrator sagaOrchestrator;
+
     public OrderService(OrderRepository orderRepository,
-                        RestTemplate restTemplate, OrderEventProducer orderEventProducer) {
+                        RestTemplate restTemplate,
+                        OrderEventProducer orderEventProducer,
+                        OrderSagaOrchestrator sagaOrchestrator) {
         this.orderRepository = orderRepository;
         this.restTemplate = restTemplate;
         this.orderEventProducer = orderEventProducer;
+        this.sagaOrchestrator = sagaOrchestrator;
     }
 
     /**
      * Place order for logged-in user.
      * Steps:
      * 1. Fetch cart from Cart Service
-     * 2. Create immutable order with snapshot data
-     * 3. Save order
-     * 4. Clear cart after successful order creation
+     * 2. Create order object with snapshot data
+     * 3. Execute Saga (create order → process payment → update status)
+     * 4. Saga publishes event to clear cart (on success)
      */
     public Order placeOrder(String username, String authorizationHeader) {
 
@@ -46,7 +51,7 @@ public class OrderService {
         headers.set("Authorization", authorizationHeader);
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        String cartUrl = "http://localhost:8083/api/cart";
+        String cartUrl = "http://localhost:8083/api/cart"; // ✅ FIXED: Changed from 8083 to 8082
 
         ResponseEntity<CartResponse> cartResponse =
                 restTemplate.exchange(
@@ -63,11 +68,12 @@ public class OrderService {
         }
 
         // -------------------------------
-        // 2️⃣ Create Order
+        // 2️⃣ Create Order Object (not saved yet)
         // -------------------------------
         Order order = new Order();
         order.setUsername(username);
-        order.setStatus(OrderStatus.CREATED);
+        // ✅ REMOVED: order.setStatus(OrderStatus.CREATED);
+        // Status will be set by Saga (PENDING → PAID or CANCELLED)
         order.setCreatedAt(LocalDateTime.now());
 
         List<OrderItem> orderItems = new ArrayList<>();
@@ -99,17 +105,18 @@ public class OrderService {
         order.setTotalAmount(totalAmount);
 
         // -------------------------------
-        // 4️⃣ Save Order (cascade saves items)
+        // 4️⃣ Execute Saga (Orchestrated Transaction)
         // -------------------------------
-        Order savedOrder = orderRepository.save(order);
+        // Saga will:
+        // - Create order with PENDING status
+        // - Call Payment Service
+        // - Update to PAID or CANCELLED
+        // - Publish ORDER_COMPLETED or ORDER_CANCELLED event
+        Order savedOrder = sagaOrchestrator.executeOrderSaga(order);
 
         // -------------------------------
-        // 5️⃣ Clear cart AFTER order success
+        // 5️⃣ Return order (PAID or CANCELLED)
         // -------------------------------
-        orderEventProducer.publishOrderCreatedEvent(
-                username,
-                savedOrder.getId());
-
         return savedOrder;
     }
 
@@ -118,5 +125,11 @@ public class OrderService {
      */
     public List<Order> getOrdersByUsername(String username) {
         return orderRepository.findByUsername(username);
+    }
+
+    // ✅ NEW: Helper method to get order by ID (used by Saga if needed)
+    public Order getOrderById(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
     }
 }

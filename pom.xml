@@ -30,6 +30,7 @@
         <module>auth-service</module>
         <module>cart-service</module>
         <module>order-service</module>
+        <module>payment-service</module>
     </modules>
 
     <dependencyManagement>

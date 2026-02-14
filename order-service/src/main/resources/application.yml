@@ -24,6 +24,9 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
+  payment:
+    urls:
+      payment-service: http://localhost:8090
 jwt:
   secret: mySuperSecureJwtSecretKeyForHS256Algorithm123456
 

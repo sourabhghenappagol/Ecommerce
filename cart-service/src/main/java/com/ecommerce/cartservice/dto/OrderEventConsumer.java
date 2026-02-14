@@ -1,13 +1,13 @@
 package com.ecommerce.cartservice.dto;
 
-public class OrderCreatedEvent {
+public class OrderEventConsumer {
 
     private String username;
     private Long orderId;
 
-    public OrderCreatedEvent() {}
+    public OrderEventConsumer() {}
 
-    public OrderCreatedEvent(String username, Long orderId) {
+    public OrderEventConsumer(String username, Long orderId) {
         this.username = username;
         this.orderId = orderId;
     }

@@ -5,6 +5,7 @@ import com.ecommerce.orderservice.dto.PaymentResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -16,11 +17,12 @@ public class PaymentServiceClient {
 
     @Value("${payment.service.url:http://localhost:8090}")
     private String paymentServiceUrl;
-
+      
     public PaymentServiceClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
-
+    
+    @Retryable(value = { RuntimeException.class }, maxAttempts = 3)
     public PaymentResponse processPayment(PaymentRequest request) {
         String url = paymentServiceUrl + "/api/payments/process";
 
